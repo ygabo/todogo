@@ -5,10 +5,41 @@ import (
 	"fmt"
 	rethink "github.com/dancannon/gorethink"
 	"github.com/martini-contrib/render"
+	"github.com/martini-contrib/sessionauth"
 	"github.com/martini-contrib/sessions"
+	"net/http"
 )
 
-func registerHandler(session sessions.Session, newUser MyUserModel, r render.Render, req *http.Request) {
+func indexHandler(r render.Render) {
+	r.HTML(200, "index", nil)
+}
+
+func getLoginHandler(r render.Render) {
+	r.HTML(200, "login", nil)
+}
+
+func getRegisterHandler(session sessions.Session, user sessionauth.User, r render.Render) {
+	sessionauth.Logout(session, user)
+	r.Redirect("/")
+}
+
+func logoutHandler(session sessions.Session, user sessionauth.User, r render.Render) {
+	sessionauth.Logout(session, user)
+	r.Redirect("/")
+}
+
+func todoListHandler(session sessions.Session, user sessionauth.User, r render.Render) {
+	items, err := user.(*User).GetMyTodoList()
+	if err != nil {
+		fmt.Println("Error getting todo list", err)
+		r.JSON(200, []Todo{}) // return empty
+	} else {
+		fmt.Println("Success, returning list.")
+		r.JSON(200, items)
+	}
+}
+
+func postRegisterHandler(session sessions.Session, newUser User, r render.Render, req *http.Request) {
 
 	if session.Get(sessionauth.SessionKey) != nil {
 		fmt.Println("Logged in already! Logout first.")
@@ -16,7 +47,7 @@ func registerHandler(session sessions.Session, newUser MyUserModel, r render.Ren
 		return
 	}
 
-	var userInDb MyUserModel
+	var userInDb User
 	query := rethink.Table("user").Filter(rethink.Row.Field("email").Eq(newUser.Email))
 	row, err := query.RunRow(dbSession)
 
@@ -54,8 +85,8 @@ func registerHandler(session sessions.Session, newUser MyUserModel, r render.Ren
 	r.Redirect(sessionauth.RedirectUrl)
 }
 
-func loginHandler(session sessions.Session, userLoggingIn MyUserModel, r render.Render, req *http.Request) {
-	var userInDb MyUserModel
+func postLoginHandler(session sessions.Session, userLoggingIn User, r render.Render, req *http.Request) {
+	var userInDb User
 	query := rethink.Table("user").Filter(rethink.Row.Field("email").Eq(userLoggingIn.Email))
 	row, err := query.RunRow(dbSession)
 	fmt.Println("logging in:", userLoggingIn.Email)

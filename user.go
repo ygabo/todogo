@@ -69,17 +69,28 @@ func (u *User) GetById(id interface{}) error {
 func (u *User) GetMyTodoList() (*[]Todo, error) {
 	if !u.IsAuthenticated() {
 		// Todo, distinguish between my own todo and others.
-		return nil, errors.New{"Not authenticated."}
+		return nil, errors.New("Not authenticated.")
 	}
 
-	row, err := rethink.Table("todo").Get(id).RunRow(dbSession)
+	query := rethink.Table("todo").Filter(rethink.Row.Field("user_id").Eq(u.UniqueId().(string)))
+	query = query.OrderBy(rethink.Asc("Created"))
+	rows, err := query.Run(dbSession)
+
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if !row.IsNil() {
-		if err := row.Scan(&u); err != nil {
-			return err
+
+	list := []Todo{}
+
+	for rows.Next() {
+		var item Todo
+
+		err := rows.Scan(&item)
+		if err != nil {
+			return &list, err
 		}
+
+		list = append(list, item)
 	}
-	return nil
+	return &list, nil
 }

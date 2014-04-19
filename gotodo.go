@@ -14,7 +14,6 @@ import (
 	"github.com/martini-contrib/sessionauth"
 	"github.com/martini-contrib/sessions"
 	"log"
-	"net/http"
 )
 
 var (
@@ -22,10 +21,6 @@ var (
 )
 
 func init() {
-
-	// Assumes there's a rethinkdb instance running locally with db called 'todo'
-	// Db has table called "user" with.
-	// "yelnil@example.com" with password "qwe"
 	var dbError error
 	dbSession, dbError = rethink.Connect(rethink.ConnectOpts{
 		Address:  "localhost:28015",
@@ -33,6 +28,23 @@ func init() {
 	if dbError != nil {
 		log.Fatalln(dbError.Error())
 	}
+
+	// Testing purposes: query myself.
+	me := User{Email: "yelnil@example.com"}
+	hpass, _ := bcrypt.GenerateFromPassword([]byte("qwe"), bcrypt.DefaultCost)
+	me.Password = string(hpass)
+	row, err := rethink.Table("user").Filter(rethink.Row.Field("email").Eq(me.Email)).RunRow(dbSession)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// I don't exist, insert me.
+	if row.IsNil() {
+		rethink.Table("user").Insert(me).RunWrite(dbSession)
+		return
+	}
+	row.Scan(&me)
+	//todo := Todo{UserId: me.UniqueId().(string), Body: "Finish todo app.", Completed: false}
+	//rethink.Table("todo").Insert(todo).RunWrite(dbSession)
 }
 
 func main() {
@@ -49,28 +61,14 @@ func main() {
 	sessionauth.RedirectUrl = "/login"
 	sessionauth.RedirectParam = "next"
 
-	m.Get("/", func(r render.Render) {
-		r.HTML(200, "index", nil)
-	})
-	m.Get("/login", func(r render.Render) {
-		r.HTML(200, "login", nil)
-	})
-	m.Get("/register", func(session sessions.Session, r render.Render) {
-		if session.Get(sessionauth.SessionKey) != nil {
-			r.HTML(200, "index", nil)
-			return
-		}
-		r.HTML(200, "register", nil)
-	})
+	m.Get("/", indexHandler)
+	m.Get("/login", getLoginHandler)
+	m.Get("/register", getRegisterHandler)
+	m.Get("/logout", sessionauth.LoginRequired, logoutHandler)
+	m.Get("/todolist", sessionauth.LoginRequired, todoListHandler)
 
-	m.Post("/register", binding.Bind(MyUserModel{}), registerHandler)
-
-	m.Post("/login", binding.Bind(MyUserModel{}), loginHandler)
-
-	m.Get("/logout", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r render.Render) {
-		sessionauth.Logout(session, user)
-		r.Redirect("/")
-	})
+	m.Post("/login", binding.Bind(User{}), postLoginHandler)
+	m.Post("/register", binding.Bind(User{}), postRegisterHandler)
 
 	m.Run()
 }
