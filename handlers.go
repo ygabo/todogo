@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/go.crypto/bcrypt"
 	"fmt"
 	rethink "github.com/dancannon/gorethink"
+	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 	"github.com/martini-contrib/sessionauth"
 	"github.com/martini-contrib/sessions"
@@ -44,7 +45,6 @@ func getTodoHandler(session sessions.Session, user sessionauth.User, r render.Re
 	} else {
 		r.HTML(200, "todo", items)
 	}
-
 }
 
 func postRegisterHandler(session sessions.Session, newUser User, r render.Render, req *http.Request) {
@@ -132,7 +132,7 @@ func postLoginHandler(session sessions.Session, userLoggingIn User, r render.Ren
 	}
 }
 
-func postTodoHandler(session sessions.Session, user sessionauth.User, todo Todo, r render.Render, req *http.Request) {
+func newTodoHandler(session sessions.Session, user sessionauth.User, todo Todo, r render.Render, req *http.Request) {
 	todo.Completed = false
 	todo.UserId = user.(*User).UniqueId().(string)
 	_, err := rethink.Table("todo").Insert(todo).RunWrite(dbSession)
@@ -143,6 +143,23 @@ func postTodoHandler(session sessions.Session, user sessionauth.User, todo Todo,
 	} else {
 		if strings.Contains(req.Header.Get("Content-Type"), "json") {
 			r.JSON(200, todo)
+		} else {
+			r.Redirect("/todo")
+		}
+	}
+}
+
+func deleteTodoHandler(user sessionauth.User, r render.Render, parms martini.Params, req *http.Request) {
+	todoId := parms["id"]
+
+	_, err := rethink.Table("todo").Get(todoId).Delete().RunWrite(dbSession)
+
+	if err != nil {
+		fmt.Println("Error deleting todo", err)
+		r.JSON(500, Todo{}) // return empty
+	} else {
+		if strings.Contains(req.Header.Get("Content-Type"), "json") {
+			r.JSON(200, nil)
 		} else {
 			r.Redirect("/todo")
 		}

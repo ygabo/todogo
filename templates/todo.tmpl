@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html>
   <body>
-    <p>This is a private link!</p>
-    <a href="/logout">Logout</a><br/>
+    <p>TODO:</p>
     <ul>
-    {{range .}} <li>{{.Body}}</li> {{end}}
+    {{range .}} 
+      <li> 
+        {{.Body}} - {{.Completed}}
+      </li> 
+    {{end}}
     </ul>
     <form method="POST">
       <input type="text" placeholder="todo" name="body" /><br />
       <button>Add</button>
     </form>
+    <br/>
+    <a href="/logout">Logout</a><br/>
   </body>
 </html>
