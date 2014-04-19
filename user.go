@@ -11,10 +11,10 @@ import (
 )
 
 type User struct {
-	Id            string `form:"id" gorethink:"id,omitempty"`
+	Id            string `form:"-" gorethink:"id,omitempty"`
 	Email         string `form:"email" gorethink:"email"`
 	Password      string `form:"password" gorethink:"password"`
-	Username      string `form:"name" gorethink:"username,omitempty"`
+	Username      string `form:"-" gorethink:"username,omitempty"`
 	Created       time.Time
 	authenticated bool `form:"-" gorethink:"-"`
 }

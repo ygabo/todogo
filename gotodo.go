@@ -65,11 +65,11 @@ func main() {
 	m.Get("/login", getLoginHandler)
 	m.Get("/register", getRegisterHandler)
 	m.Get("/logout", sessionauth.LoginRequired, logoutHandler)
-	m.Get("/todo", sessionauth.LoginRequired, getTodoListHandler)
+	m.Get("/todo", sessionauth.LoginRequired, getTodoHandler)
 
 	m.Post("/login", binding.Bind(User{}), postLoginHandler)
 	m.Post("/register", binding.Bind(User{}), postRegisterHandler)
-	m.Post("/todo", binding.Bind(User{}), postRegisterHandler)
+	m.Post("/todo", sessionauth.LoginRequired, binding.Bind(User{}), binding.Bind(Todo{}), postTodoHandler)
 
 	m.Run()
 }

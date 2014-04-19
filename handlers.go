@@ -8,6 +8,7 @@ import (
 	"github.com/martini-contrib/sessionauth"
 	"github.com/martini-contrib/sessions"
 	"net/http"
+	"strings"
 )
 
 func indexHandler(r render.Render) {
@@ -28,15 +29,22 @@ func logoutHandler(session sessions.Session, user sessionauth.User, r render.Ren
 	r.Redirect("/")
 }
 
-func getTodoListHandler(session sessions.Session, user sessionauth.User, r render.Render) {
+func getTodoHandler(session sessions.Session, user sessionauth.User, r render.Render, req *http.Request) {
 	items, err := user.(*User).GetMyTodoList()
 	if err != nil {
 		fmt.Println("Error getting todo list", err)
-		r.JSON(200, []Todo{}) // return empty
+		items = nil
 	} else {
 		fmt.Println("Success, returning list.")
-		r.JSON(200, items)
+		//r.JSON(200, items)
 	}
+
+	if strings.Contains(req.Header.Get("Content-Type"), "json") {
+		r.JSON(200, items)
+	} else {
+		r.HTML(200, "todo", items)
+	}
+
 }
 
 func postRegisterHandler(session sessions.Session, newUser User, r render.Render, req *http.Request) {
@@ -121,5 +129,22 @@ func postLoginHandler(session sessions.Session, userLoggingIn User, r render.Ren
 		params := req.URL.Query()
 		redirect := params.Get(sessionauth.RedirectParam)
 		r.Redirect(redirect)
+	}
+}
+
+func postTodoHandler(session sessions.Session, user sessionauth.User, todo Todo, r render.Render, req *http.Request) {
+	todo.Completed = false
+	todo.UserId = user.(*User).UniqueId().(string)
+	_, err := rethink.Table("todo").Insert(todo).RunWrite(dbSession)
+
+	if err != nil {
+		fmt.Println("Error saving new todo", err)
+		r.JSON(500, Todo{}) // return empty
+	} else {
+		if strings.Contains(req.Header.Get("Content-Type"), "json") {
+			r.JSON(200, todo)
+		} else {
+			r.Redirect("/todo")
+		}
 	}
 }
