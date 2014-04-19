@@ -50,8 +50,7 @@ func (u *User) UniqueId() interface{} {
 	return u.Id
 }
 
-// GetById will populate a user object from a database model with
-// a matching id.
+// Get user from the DB by id and populate it into 'u'
 func (u *User) GetById(id interface{}) error {
 
 	row, err := rethink.Table("user").Get(id).RunRow(dbSession)
@@ -66,12 +65,14 @@ func (u *User) GetById(id interface{}) error {
 	return nil
 }
 
+// Get the todo list associated with a user.
 func (u *User) GetMyTodoList() (*[]Todo, error) {
 	if !u.IsAuthenticated() {
-		// Todo, distinguish between my own todo and others.
+		// TODO, distinguish between my own todo and others.
 		return nil, errors.New("Not authenticated.")
 	}
 
+	//.(string) means it's casting the id into a string. (it returns an interface)
 	query := rethink.Table("todo").Filter(rethink.Row.Field("user_id").Eq(u.UniqueId().(string)))
 	query = query.OrderBy(rethink.Asc("Created"))
 	rows, err := query.Run(dbSession)

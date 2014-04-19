@@ -28,7 +28,7 @@ func logoutHandler(session sessions.Session, user sessionauth.User, r render.Ren
 	r.Redirect("/")
 }
 
-func todoListHandler(session sessions.Session, user sessionauth.User, r render.Render) {
+func getTodoListHandler(session sessions.Session, user sessionauth.User, r render.Render) {
 	items, err := user.(*User).GetMyTodoList()
 	if err != nil {
 		fmt.Println("Error getting todo list", err)
