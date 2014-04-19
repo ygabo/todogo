@@ -42,7 +42,7 @@ func init() {
 		rethink.Table("user").Insert(me).RunWrite(dbSession)
 		return
 	}
-	row.Scan(&me)
+	//row.Scan(&me)
 	//todo := Todo{UserId: me.UniqueId().(string), Body: "Finish todo app.", Completed: false}
 	//rethink.Table("todo").Insert(todo).RunWrite(dbSession)
 }
