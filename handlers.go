@@ -142,7 +142,7 @@ func newTodoHandler(session sessions.Session, user sessionauth.User, todo Todo, 
 		r.JSON(500, Todo{}) // return empty
 	} else {
 		if strings.Contains(req.Header.Get("Content-Type"), "json") {
-			r.JSON(200, todo)
+			r.JSON(200, todo) // return OK
 		} else {
 			r.Redirect("/todo")
 		}

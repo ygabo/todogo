@@ -1,5 +1,5 @@
 // This is from the martini-contrib example
-// but this is using mysql instead of sqlite3
+// but this is using rethinkdb instead of sqlite3
 // For learning purposes only.
 package main
 
