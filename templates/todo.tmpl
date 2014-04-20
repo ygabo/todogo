@@ -2,26 +2,14 @@
 <html>
   <head>
       <meta charset="UTF-8">
-      <script src="build/react.js"></script>
-      <script src="build/JSXTransformer.js"></script>
   </head>
   <body>
-    <div id="app"> </div>
     <p>TODO:</p>
-    <ul>
-    {{range .}} 
-      <li> 
-        {{.Body}} - {{.Completed}}
-      </li> 
-    {{end}}
-    </ul>
     <form method="POST">
       <input type="text" placeholder="todo" name="body" /><br />
       <button>Add</button>
     </form>
     <br/>
     <a href="/logout">Logout</a><br/>
-    <script type="text/jsx" src="jsx/app.js"></script>
   </body>
-
 </html>

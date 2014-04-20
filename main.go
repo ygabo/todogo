@@ -50,7 +50,11 @@ func init() {
 func main() {
 	store := sessions.NewCookieStore([]byte("secret123"))
 	m := martini.Classic()
-	m.Use(render.Renderer())
+
+	templateOptions := render.Options{}
+	templateOptions.Delims.Left = "#{"
+	templateOptions.Delims.Right = "}#"
+	m.Use(render.Renderer(templateOptions))
 
 	store.Options(sessions.Options{MaxAge: 0})
 	m.Use(sessions.Sessions("my_session", store))
@@ -73,6 +77,6 @@ func main() {
 
 	m.Delete("/todo/:id", sessionauth.LoginRequired, deleteTodoHandler)
 	m.Post("/xtodo/:id", sessionauth.LoginRequired, deleteTodoHandler)
-	m.Use(martini.Static("assets"))
+	m.Use(martini.Static("static"))
 	m.Run()
 }
