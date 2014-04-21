@@ -63,9 +63,7 @@ func getTodoJSON(session sessions.Session, user sessionauth.User, r render.Rende
 	}
 
 	if id != "" {
-		items = &[]Todo{}
-		*items = append(*items, *item)
-		r.JSON(200, (*items)[0])
+		r.JSON(200, item)
 	} else {
 		r.JSON(200, items)
 	}
