@@ -30,7 +30,7 @@ func logoutHandler(session sessions.Session, user sessionauth.User, r render.Ren
 	r.Redirect("/")
 }
 
-func getTodoHandler(session sessions.Session, user sessionauth.User, r render.Render, req *http.Request) {
+func getTodoPage(session sessions.Session, user sessionauth.User, r render.Render, req *http.Request) {
 	items, err := user.(*User).GetMyTodoList()
 	if err != nil {
 		fmt.Println("Error getting todo list", err)
@@ -39,12 +39,18 @@ func getTodoHandler(session sessions.Session, user sessionauth.User, r render.Re
 		fmt.Println("Success, returning list.")
 		//r.JSON(200, items)
 	}
+	r.HTML(200, "todo", items)
+}
 
-	if strings.Contains(req.Header.Get("Content-Type"), "json") {
-		r.JSON(200, items)
+func getTodoJSON(session sessions.Session, user sessionauth.User, r render.Render, req *http.Request) {
+	items, err := user.(*User).GetMyTodoList()
+	if err != nil {
+		fmt.Println("Error getting todo list", err)
+		items = nil
 	} else {
-		r.HTML(200, "todo", items)
+		fmt.Println("Success, returning list.")
 	}
+	r.JSON(200, items)
 }
 
 func postRegisterHandler(session sessions.Session, newUser User, r render.Render, req *http.Request) {

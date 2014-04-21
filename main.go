@@ -69,7 +69,8 @@ func main() {
 	m.Get("/login", getLoginHandler)
 	m.Get("/register", getRegisterHandler)
 	m.Get("/logout", sessionauth.LoginRequired, logoutHandler)
-	m.Get("/todo", sessionauth.LoginRequired, getTodoHandler)
+	m.Get("/todo", sessionauth.LoginRequired, getTodoPage)
+	m.Get("/todo.json", sessionauth.LoginRequired, getTodoJSON)
 
 	m.Post("/login", binding.Bind(User{}), postLoginHandler)
 	m.Post("/register", binding.Bind(User{}), postRegisterHandler)

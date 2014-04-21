@@ -1,15 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="todoapp">
   <head>
       <meta charset="UTF-8">
   </head>
-  <body>
-    <p>TODO:</p>
-    <form method="POST">
-      <input type="text" placeholder="todo" name="body" /><br />
-      <button>Add</button>
-    </form>
-    <br/>
-    <a href="/logout">Logout</a><br/>
+  <script src="build/angular.js"></script>
+  <body ng-controller="TodoCtrl as todo">
+  TODO:
+    <div ng-repeat="t in todo.list">
+      {{t.body}} - {{t.completed}}
+    </div>
+
+  <script src="build/angular-resource.js"></script>
+  <script>
+    var todoapp = new angular.module("todoapp", ["ngResource"]);
+
+    todoapp.controller("TodoCtrl", function($scope, $resource){
+      var todo = this
+      var todoAPI = $resource("/todo.json", {}, {})
+
+      todoAPI.query(function(data){
+        todo.list = data
+        console.log(data)
+      });
+
+    });
+  </script>
   </body>
 </html>
