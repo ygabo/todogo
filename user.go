@@ -105,7 +105,7 @@ func (u *User) GetMyTodoByID(todoID string) (*Todo, error) {
 	}
 
 	query := rethink.Table("todo").Filter(rethink.Row.Field("id").Eq(todoID))
-	rows, err := query.Run(dbSession)
+	row, err := query.RunRow(dbSession)
 
 	if row.IsNil() || err != nil {
 		return nil, err

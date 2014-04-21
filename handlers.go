@@ -43,18 +43,32 @@ func getTodoPage(session sessions.Session, user sessionauth.User, r render.Rende
 }
 
 func getTodoJSON(session sessions.Session, user sessionauth.User, r render.Render, parms martini.Params, req *http.Request) {
-	if parms["id"] {
-		items, err := user.(*User).GetMyTodoList()
+	var items *[]Todo
+	var item *Todo
+	var err error
+
+	id := parms["id"]
+	fmt.Println("gettodo, id:", id)
+	if id != "" {
+		item, err = user.(*User).GetMyTodoByID(id)
 	} else {
-		items, err := user.(*User).GetMyTodoList()
+		items, err = user.(*User).GetMyTodoList()
 	}
+
 	if err != nil {
 		fmt.Println("Error getting todo list", err)
 		items = nil
 	} else {
 		fmt.Println("Success, returning list.")
 	}
-	r.JSON(200, items)
+
+	if id != "" {
+		items = &[]Todo{}
+		*items = append(*items, *item)
+		r.JSON(200, (*items)[0])
+	} else {
+		r.JSON(200, items)
+	}
 }
 
 func postRegisterHandler(session sessions.Session, newUser User, r render.Render, req *http.Request) {
