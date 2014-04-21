@@ -4,38 +4,60 @@
       <meta charset="UTF-8">
   </head>
   <script src="build/angular.js"></script>
+  <script src="build/angular-resource.js"></script>
   <body ng-controller="TodoCtrl as todo">
-  TODO:
-    <div ng-repeat="t in todo.list">
+    TODO:
+    <div ng-repeat="t in todo.items">
       {{t.body}} - {{t.completed}}
     </div>
+    <form>
+    <input type="text" ng-model="todo.newTodoBody"> </input>
+    <button ng-click="todo.add()">Add</button>
+    </form>
+    <script>
+      var todoapp = new angular.module("todoapp", ["ngResource"]);
 
-  <script src="build/angular-resource.js"></script>
-  <script>
-    var todoapp = new angular.module("todoapp", ["ngResource"]);
+      todoapp.controller("TodoCtrl", function($scope, $resource) {
+        var Todo = $resource("/todo.json/:id", {id: '@id'}, {})
+        var todoCtrl = this
+        todoCtrl.items = #{.}# // golang template insert
 
-    todoapp.controller("TodoCtrl", function($scope, $resource)
-    {
-      var todo = this
-      var server = $resource("/todo.json/:id", {id: '@id'}, {})
-      todo.list = #{.}# // golang template insert
-
-      if (!todo.list) { // if list not there, query server
-        server.query(
-          function(data) { // callback
-            todo.list = data
+        todoCtrl.list = function(index) {
+          Todo.query( 
+            function(data) { // callback
+              todoCtrl.items = data
           });
-      }
-
-      todo.get = function(index){
-        if (!todo.list) {
-          return
         }
-        server.get({id: todo.list[index].id}, function(data) {
-          todo.list[index] = data
-        });
-      }
-    });
-  </script>
+
+        if (!todoCtrl.items) { // if list not there, query server
+          todoCtrl.list();
+        }
+
+        todoCtrl.get = function(index) {
+          if (!todoCtrl.items[index]) {
+            return
+          }
+          Todo.get({id: todoCtrl.items[index].id}, 
+            function(data) {
+              todoCtrl.items[index] = data
+          });
+        }
+
+        todoCtrl.remove = function(index) {
+
+        }
+
+        todoCtrl.add = function() {
+          var item = new Todo()
+          item.body = todoCtrl.newTodoBody
+          item.completed = false
+          item.$save(function(data) {
+            console.log(data)
+            todoCtrl.items.push(data)
+          });
+          todoCtrl.newTodoBody = ""
+        }
+      });
+    </script>
   </body>
 </html>

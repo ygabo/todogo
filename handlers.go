@@ -154,8 +154,7 @@ func postLoginHandler(session sessions.Session, userLoggingIn User, r render.Ren
 	}
 }
 
-func newTodoHandler(session sessions.Session, user sessionauth.User, todo Todo, r render.Render, req *http.Request) {
-	todo.Completed = false
+func newTodoHandler(user sessionauth.User, todo Todo, r render.Render, req *http.Request) {
 	todo.UserId = user.(*User).UniqueId().(string)
 	_, err := rethink.Table("todo").Insert(todo).RunWrite(dbSession)
 
@@ -163,11 +162,7 @@ func newTodoHandler(session sessions.Session, user sessionauth.User, todo Todo, 
 		fmt.Println("Error saving new todo", err)
 		r.JSON(500, Todo{}) // return empty
 	} else {
-		if strings.Contains(req.Header.Get("Content-Type"), "json") {
-			r.JSON(200, todo) // return OK
-		} else {
-			r.Redirect("/todo")
-		}
+		r.JSON(200, todo) // return OK
 	}
 }
 

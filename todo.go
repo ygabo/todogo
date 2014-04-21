@@ -7,11 +7,11 @@ import (
 )
 
 type Todo struct {
-	Id        string    `form:"-" gorethink:"id,omitempty" json:"id"`
-	UserId    string    `form:"-" gorethink:"user_id" json:"user_id"`
+	Id        string    `form:"-" gorethink:"id,omitempty" json:"id,omitempty"`
+	UserId    string    `form:"-" gorethink:"user_id" json:"user_id,omitempty"`
 	Body      string    `form:"body" gorethink:"body" json:"body"`
 	Completed bool      `form:"-" gorethink:"completed" json:"completed"`
-	Created   time.Time `json:"created_at"`
+	Created   time.Time `json:"created_at,omitempty"`
 }
 
 func (t *Todo) isCompleted() bool {
