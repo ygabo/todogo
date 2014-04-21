@@ -17,18 +17,25 @@ func indexHandler(r render.Render) {
 	r.HTML(200, "index", nil)
 }
 
-func getLoginHandler(r render.Render) {
+func getLoginHandler(user sessionauth.User, r render.Render) {
+	if user.IsAuthenticated() {
+		r.Redirect("/")
+		return
+	}
 	r.HTML(200, "login", nil)
-}
-
-func getRegisterHandler(session sessions.Session, user sessionauth.User, r render.Render) {
-	sessionauth.Logout(session, user)
-	r.Redirect("/")
 }
 
 func logoutHandler(session sessions.Session, user sessionauth.User, r render.Render) {
 	sessionauth.Logout(session, user)
 	r.Redirect("/")
+}
+
+func getRegisterHandler(user sessionauth.User, r render.Render) {
+	if user.IsAuthenticated() {
+		r.Redirect("/")
+		return
+	}
+	r.HTML(200, "register", nil)
 }
 
 func getTodoPage(session sessions.Session, user sessionauth.User, r render.Render, req *http.Request) {
@@ -38,7 +45,6 @@ func getTodoPage(session sessions.Session, user sessionauth.User, r render.Rende
 		items = nil
 	} else {
 		fmt.Println("Success, returning list.")
-		//r.JSON(200, items)
 	}
 	r.HTML(200, "todo", items)
 }
@@ -119,21 +125,15 @@ func postLoginHandler(session sessions.Session, userLoggingIn User, r render.Ren
 	var userInDb User
 	query := rethink.Table("user").Filter(rethink.Row.Field("email").Eq(userLoggingIn.Email))
 	row, err := query.RunRow(dbSession)
-	fmt.Println("logging in:", userLoggingIn.Email)
 
 	// TODO do flash errors
 	if err == nil && !row.IsNil() {
 		if err := row.Scan(&userInDb); err != nil {
-			fmt.Println("Error scanning user in DB")
 			r.Redirect(sessionauth.RedirectUrl)
 			return
 		}
 	} else {
-		if row.IsNil() {
-			fmt.Println("User doesn't exist")
-		} else {
-			fmt.Println(err)
-		}
+		fmt.Println(err)
 		r.Redirect(sessionauth.RedirectUrl)
 		return
 	}
