@@ -17,12 +17,13 @@
     todoapp.controller("TodoCtrl", function($scope, $resource){
       var todo = this
       var todoAPI = $resource("/todo.json", {}, {})
+      todo.list = #{.}# //golang template insert
 
-      todoAPI.query(function(data){
-        todo.list = data
-        console.log(data)
-      });
-
+      if (!todo.list) {
+        todoAPI.query(function(data){
+          todo.list = data
+        });
+      }
     });
   </script>
   </body>
