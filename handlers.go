@@ -2,6 +2,7 @@ package main
 
 import (
 	"code.google.com/p/go.crypto/bcrypt"
+	"errors"
 	"fmt"
 	rethink "github.com/dancannon/gorethink"
 	"github.com/go-martini/martini"
@@ -9,7 +10,6 @@ import (
 	"github.com/martini-contrib/sessionauth"
 	"github.com/martini-contrib/sessions"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -49,7 +49,6 @@ func getTodoJSON(session sessions.Session, user sessionauth.User, r render.Rende
 	var err error
 
 	id := parms["id"]
-	fmt.Println("gettodo, id:", id)
 	if id != "" {
 		item, err = user.(*User).GetMyTodoByID(id)
 	} else {
@@ -164,28 +163,27 @@ func postTodoHandler(user sessionauth.User, todo Todo, r render.Render, req *htt
 	} else {
 		_, err = rethink.Table("todo").Update(todo).RunWrite(dbSession)
 	}
-
+	fmt.Println("ID:", todo.Id)
 	if err != nil {
 		fmt.Println("Error saving new todo", err)
-		r.JSON(500, Todo{}) // return empty
+		r.JSON(500, 0) // return empty
 	} else {
-		r.JSON(200, todo) // return OK
+		r.JSON(200, 1) // return OK
 	}
 }
 
 func deleteTodoHandler(user sessionauth.User, r render.Render, parms martini.Params, req *http.Request) {
-	todoId := parms["id"]
+	todoID := parms["id"]
+	var err error
 
-	_, err := rethink.Table("todo").Get(todoId).Delete().RunWrite(dbSession)
-
-	if err != nil {
-		fmt.Println("Error deleting todo", err)
-		r.JSON(500, Todo{}) // return empty
+	if todoID != "" {
+		_, err = rethink.Table("todo").Get(todoID).Delete().RunWrite(dbSession)
 	} else {
-		if strings.Contains(req.Header.Get("Content-Type"), "json") {
-			r.JSON(200, nil)
-		} else {
-			r.Redirect("/todo")
-		}
+		err = errors.New("Invalid ID.")
+	}
+	if err != nil {
+		r.JSON(500, 0) // return empty
+	} else {
+		r.JSON(200, 1)
 	}
 }

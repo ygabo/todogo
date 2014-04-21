@@ -7,8 +7,8 @@
   <script src="build/angular-resource.js"></script>
   <body ng-controller="TodoCtrl as todo">
     TODO:
-    <div ng-repeat="t in todo.items">
-      {{t.body}} - <span ng-click="todo.toggle($index)">{{t.completed}} </span>
+    <div ng-repeat="t in todo.items | orderBy:t.created_at">
+      <span ng-click="todo.remove($index)">x</span> {{t.body}} - <span ng-click="todo.toggle($index)">{{t.completed}} </span>
     </div>
     <form>
     <input type="text" ng-model="todo.newTodoBody"> </input>
@@ -22,7 +22,7 @@
         var todoCtrl = this
         todoCtrl.items = #{.}# // golang template insert
 
-        todoCtrl.list = function(index) {
+        todoCtrl.list = function() {
           Todo.query( 
             function(data) { // callback
               todoCtrl.items = data
@@ -44,7 +44,14 @@
         }
 
         todoCtrl.remove = function(index) {
-
+          event.preventDefault()
+          var item = todoCtrl.items[index]
+          todoCtrl.items.splice(index,1) // remove item
+          Todo.delete({id: item.id}, function(data){
+            if (data[0] != 1) {
+              todoCtrl.list();
+            }
+          });
         }
 
         todoCtrl.add = function() {
@@ -52,8 +59,7 @@
           item.body = todoCtrl.newTodoBody
           item.completed = false
           item.$save(function(data) {
-            console.log(data)
-            todoCtrl.items.push(data)
+            todoCtrl.list()
           });
           todoCtrl.newTodoBody = ""
         }

@@ -85,12 +85,10 @@ func (u *User) GetMyTodoList() (*[]Todo, error) {
 
 	for rows.Next() {
 		var item Todo
-
 		err := rows.Scan(&item)
 		if err != nil {
 			return &list, err
 		}
-
 		list = append(list, item)
 	}
 	return &list, nil
