@@ -12,7 +12,7 @@
     </div>
     <form ng-submit="todo.add()">
       <input type="text" ng-model="todo.newTodoBody"> </input>
-      <input type="submit" id="submit" value="Submit" />
+      <input type="submit" id="submit" value="Add" />
     </form>
     <script>
       var todoapp = new angular.module("todoapp", ["ngResource"]);
@@ -48,7 +48,7 @@
           var item = todoCtrl.items[index]
           todoCtrl.items.splice(index,1) // remove item
           Todo.delete({id: item.id}, function(data){
-            if (data[0] != 1) {
+            if (!(data[0] === '1')){
               todoCtrl.list();
             }
           });
@@ -58,7 +58,6 @@
           if (!todoCtrl.newTodoBody || todoCtrl.newTodoBody === "")  {
             return
           }
-          console.log(todoCtrl.newTodoBody)
           var item = new Todo()
           item.body = todoCtrl.newTodoBody
           item.completed = false
