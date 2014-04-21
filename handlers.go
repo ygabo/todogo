@@ -42,8 +42,12 @@ func getTodoPage(session sessions.Session, user sessionauth.User, r render.Rende
 	r.HTML(200, "todo", items)
 }
 
-func getTodoJSON(session sessions.Session, user sessionauth.User, r render.Render, req *http.Request) {
-	items, err := user.(*User).GetMyTodoList()
+func getTodoJSON(session sessions.Session, user sessionauth.User, r render.Render, parms martini.Params, req *http.Request) {
+	if parms["id"] {
+		items, err := user.(*User).GetMyTodoList()
+	} else {
+		items, err := user.(*User).GetMyTodoList()
+	}
 	if err != nil {
 		fmt.Println("Error getting todo list", err)
 		items = nil

@@ -95,3 +95,26 @@ func (u *User) GetMyTodoList() (*[]Todo, error) {
 	}
 	return &list, nil
 }
+
+// Get a todo item by id associated by this user
+func (u *User) GetMyTodoByID(todoID string) (*Todo, error) {
+	if !u.IsAuthenticated() {
+		// TODO, distinguish between my own todo and others.
+		// If I want others to see my todo
+		return nil, errors.New("Not authenticated.")
+	}
+
+	query := rethink.Table("todo").Filter(rethink.Row.Field("id").Eq(todoID))
+	rows, err := query.Run(dbSession)
+
+	if row.IsNil() || err != nil {
+		return nil, err
+	}
+
+	todo := Todo{}
+	if err := row.Scan(&todo); err != nil {
+		return nil, err
+	}
+
+	return &todo, nil
+}
