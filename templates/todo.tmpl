@@ -17,12 +17,11 @@
     todoapp.controller("TodoCtrl", function($scope, $resource)
     {
       var todo = this
-      var todolist = $resource("/todo.json", {}, {})
-      var todoitem = $resource("/todo/:id", )
+      var server = $resource("/todo.json/:id", {id: '@id'}, {})
       todo.list = #{.}# // golang template insert
 
       if (!todo.list) { // if list not there, query server
-        todolist.query(
+        server.query(
           function(data) { // callback
             todo.list = data
           });
@@ -30,8 +29,11 @@
 
       todo.get = function(index){
         if (!todo.list) {
-          return null
+          return
         }
+        server.get({id: todo.list[index].id}, function(data) {
+          todo.list[index] = data
+        });
       }
     });
   </script>
