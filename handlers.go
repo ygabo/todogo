@@ -10,6 +10,7 @@ import (
 	"github.com/martini-contrib/sessions"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func indexHandler(r render.Render) {
@@ -154,9 +155,15 @@ func postLoginHandler(session sessions.Session, userLoggingIn User, r render.Ren
 	}
 }
 
-func newTodoHandler(user sessionauth.User, todo Todo, r render.Render, req *http.Request) {
+func postTodoHandler(user sessionauth.User, todo Todo, r render.Render, req *http.Request) {
 	todo.UserId = user.(*User).UniqueId().(string)
-	_, err := rethink.Table("todo").Insert(todo).RunWrite(dbSession)
+	var err error
+	if todo.Id == "" {
+		todo.Created = time.Now()
+		_, err = rethink.Table("todo").Insert(todo).RunWrite(dbSession)
+	} else {
+		_, err = rethink.Table("todo").Update(todo).RunWrite(dbSession)
+	}
 
 	if err != nil {
 		fmt.Println("Error saving new todo", err)

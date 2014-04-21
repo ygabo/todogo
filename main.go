@@ -75,7 +75,8 @@ func main() {
 
 	m.Post("/login", binding.Bind(User{}), postLoginHandler)
 	m.Post("/register", binding.Bind(User{}), postRegisterHandler)
-	m.Post("/todo.json", sessionauth.LoginRequired, binding.Bind(Todo{}), newTodoHandler)
+	m.Post("/todo.json", sessionauth.LoginRequired, binding.Bind(Todo{}), postTodoHandler)
+	m.Post("/todo.json/:id", sessionauth.LoginRequired, binding.Bind(Todo{}), postTodoHandler)
 
 	m.Delete("/todo/:id", sessionauth.LoginRequired, deleteTodoHandler)
 	m.Post("/xtodo/:id", sessionauth.LoginRequired, deleteTodoHandler)

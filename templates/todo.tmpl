@@ -8,7 +8,7 @@
   <body ng-controller="TodoCtrl as todo">
     TODO:
     <div ng-repeat="t in todo.items">
-      {{t.body}} - {{t.completed}}
+      {{t.body}} - <span ng-click="todo.toggle($index)">{{t.completed}} </span>
     </div>
     <form>
     <input type="text" ng-model="todo.newTodoBody"> </input>
@@ -56,6 +56,11 @@
             todoCtrl.items.push(data)
           });
           todoCtrl.newTodoBody = ""
+        }
+
+        todoCtrl.toggle = function(index){
+          todoCtrl.items[index].completed = !todoCtrl.items[index].completed
+          Todo.save(todoCtrl.items[index])
         }
       });
     </script>
