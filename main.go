@@ -70,15 +70,15 @@ func main() {
 	m.Get("/register", getRegisterHandler)
 	m.Get("/logout", sessionauth.LoginRequired, logoutHandler)
 	m.Get("/todo", sessionauth.LoginRequired, getTodoPage)
-	m.Get("/todo.json", sessionauth.LoginRequired, getTodoJSON)
-	m.Get("/todo.json/:id", sessionauth.LoginRequired, getTodoJSON)
-
 	m.Post("/login", binding.Bind(User{}), postLoginHandler)
 	m.Post("/register", binding.Bind(User{}), postRegisterHandler)
+
+	m.Get("/todo.json", sessionauth.LoginRequired, getTodoJSON)
+	m.Get("/todo.json/:id", sessionauth.LoginRequired, getTodoJSON)
 	m.Post("/todo.json", sessionauth.LoginRequired, binding.Bind(Todo{}), postTodoHandler)
 	m.Post("/todo.json/:id", sessionauth.LoginRequired, binding.Bind(Todo{}), postTodoHandler)
-
 	m.Delete("/todo.json/:id", sessionauth.LoginRequired, deleteTodoHandler)
+
 	m.Use(martini.Static("static"))
 	m.Run()
 }

@@ -10,9 +10,9 @@
     <div ng-repeat="t in todo.items | orderBy:t.created_at">
       <span ng-click="todo.remove($index)">x</span> {{t.body}} - <span ng-click="todo.toggle($index)">{{t.completed}} </span>
     </div>
-    <form>
-    <input type="text" ng-model="todo.newTodoBody"> </input>
-    <button ng-click="todo.add()">Add</button>
+    <form ng-submit="todo.add()">
+      <input type="text" ng-model="todo.newTodoBody"> </input>
+      <input type="submit" id="submit" value="Submit" />
     </form>
     <script>
       var todoapp = new angular.module("todoapp", ["ngResource"]);
@@ -55,6 +55,10 @@
         }
 
         todoCtrl.add = function() {
+          if (!todoCtrl.newTodoBody || todoCtrl.newTodoBody === "")  {
+            return
+          }
+          console.log(todoCtrl.newTodoBody)
           var item = new Todo()
           item.body = todoCtrl.newTodoBody
           item.completed = false
