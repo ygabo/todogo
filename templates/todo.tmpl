@@ -14,15 +14,19 @@
   <script>
     var todoapp = new angular.module("todoapp", ["ngResource"]);
 
-    todoapp.controller("TodoCtrl", function($scope, $resource){
+    todoapp.controller("TodoCtrl", function($scope, $resource)
+    {
       var todo = this
       var todoAPI = $resource("/todo.json", {}, {})
       todo.list = #{.}# //golang template insert
 
-      if (!todo.list) {
-        todoAPI.query(function(data){
-          todo.list = data
-        });
+      if (!todo.list) 
+      { // if list not there, query server
+        todoAPI.query(
+          function(data)
+          { // callback
+            todo.list = data
+          });
       }
     });
   </script>
