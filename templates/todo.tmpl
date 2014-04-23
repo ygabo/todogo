@@ -9,9 +9,9 @@
     TODO:
     <div ng-repeat="t in todo.items | orderBy:t.created_at">
       <form ng-submit="todo.save(t)">
-        <span ng-click="todo.remove($index)">x</span>  
-        <input type="text" ng-model="t.body"> </input>
-        <span ng-click="todo.toggle($index)">{{t.completed}} </span>
+        <input type="checkbox" ng-model="t.completed" ng-click="todo.toggle($index)"></input>
+        <input type="text" ng-model="t.body" ng-style="t.completed && {'text-decoration':'line-through'}"> </input>
+        <span ng-click="todo.remove($index)">x</span>
       </form>
     </div>
     <form ng-submit="todo.add()">
