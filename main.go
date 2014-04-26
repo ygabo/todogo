@@ -79,6 +79,8 @@ func main() {
 	m.Post("/todo.json/:id", sessionauth.LoginRequired, binding.Bind(Todo{}), postTodoHandler)
 	m.Delete("/todo.json/:id", sessionauth.LoginRequired, deleteTodoHandler)
 
+	m.Get("/clear", sessionauth.LoginRequired, clearCompleted)
+
 	m.Use(martini.Static("static"))
 	m.Run()
 }

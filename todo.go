@@ -35,6 +35,3 @@ func (t *Todo) GetById(id interface{}) error {
 	}
 	return nil
 }
-
-type TodoList struct {
-}

@@ -187,3 +187,17 @@ func deleteTodoHandler(user sessionauth.User, r render.Render, parms martini.Par
 		r.JSON(200, 1)
 	}
 }
+
+func clearCompleted(user sessionauth.User, r render.Render, req *http.Request) {
+	userID := user.UniqueId().(string)
+	// this isn't very nosql
+	query := rethink.Table("todo").Filter(rethink.Row.Field("user_id").Eq(userID))
+	query = query.Filter(rethink.Row.Field("completed").Eq(true))
+	_, err = query.Delete().RunWrite(dbSession)
+
+	if err != nil {
+		r.JSON(500, 0) // return empty
+	} else {
+		r.JSON(200, 1)
+	}
+}
