@@ -11,7 +11,7 @@
     <div ng-repeat="t in todo.items | orderBy:t.created_at">
       <form ng-submit="todo.save(t)">
         <input type="checkbox" ng-model="t.completed" ng-click="todo.toggle($index)"></input>
-        <input id="tasks" type="text" ng-model="t.body" 
+        <input id="tasks" type="text" ng-model="t.body" size="100 "
                ng-style="t.completed && {'text-decoration':'line-through','color':'grey'}"> </input>
         <span ng-click="todo.remove($index)">x</span>
       </form>
@@ -20,7 +20,7 @@
       <input type="text" ng-model="todo.newTodoBody"> </input>
       <input type="submit" id="submit" value="Add" />
     </form>
-    <button ng-click="todo.clearComplete()"> Clear Complete </button>
+    <button ng-click="todo.clearComplete()"> Clear Complete </button> 
     <script>
       var todoapp = new angular.module("todoapp", ["ngResource"]);
 
@@ -85,6 +85,7 @@
 
         todoCtrl.clearComplete = function(){
           event.preventDefault();
+          // this one clears completed task of current logged in user
           $http.get('/clear').success(function(){
             todoCtrl.list()
           });

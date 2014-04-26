@@ -188,6 +188,7 @@ func deleteTodoHandler(user sessionauth.User, r render.Render, parms martini.Par
 	}
 }
 
+// clearCompleted clears completed tasks of current logged in user
 func clearCompleted(user sessionauth.User, r render.Render, req *http.Request) {
 	userID := user.UniqueId().(string)
 	var err error
