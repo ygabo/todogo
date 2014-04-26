@@ -190,6 +190,7 @@ func deleteTodoHandler(user sessionauth.User, r render.Render, parms martini.Par
 
 func clearCompleted(user sessionauth.User, r render.Render, req *http.Request) {
 	userID := user.UniqueId().(string)
+	var err error
 	// this isn't very nosql
 	query := rethink.Table("todo").Filter(rethink.Row.Field("user_id").Eq(userID))
 	query = query.Filter(rethink.Row.Field("completed").Eq(true))

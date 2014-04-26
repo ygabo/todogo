@@ -20,10 +20,11 @@
       <input type="text" ng-model="todo.newTodoBody"> </input>
       <input type="submit" id="submit" value="Add" />
     </form>
+    <button ng-click="todo.clearComplete()"> Clear Complete </button>
     <script>
       var todoapp = new angular.module("todoapp", ["ngResource"]);
 
-      todoapp.controller("TodoCtrl", function($scope, $resource) {
+      todoapp.controller("TodoCtrl", function($scope, $resource, $http) {
         var Todo = $resource("/todo.json/:id", {id: '@id'}, {})
         var todoCtrl = this
         todoCtrl.items = #{.}# // golang template insert
@@ -81,6 +82,14 @@
           todoCtrl.items[index].completed = !todoCtrl.items[index].completed
           Todo.save(todoCtrl.items[index])
         }
+
+        todoCtrl.clearComplete = function(){
+          event.preventDefault();
+          $http.get('/clear').success(function(){
+            todoCtrl.list()
+          });
+        }
+
       });
     </script>
   </body>
