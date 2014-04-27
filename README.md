@@ -1,6 +1,8 @@
 todogo
 ======
 
-Todo app using Go. Martini+RethinkDB with AngularJS in the client side.
+Todo app using Go. Todo list with user auth.
+
+Martini using RethinkDB, with AngularJS in the client side.
 
 For personal learning purposes only.
