@@ -5,15 +5,17 @@
 package main
 
 import (
-	"code.google.com/p/go.crypto/bcrypt"
 	"fmt"
+	"log"
+	"runtime"
+
+	"code.google.com/p/go.crypto/bcrypt"
 	rethink "github.com/dancannon/gorethink"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
 	"github.com/martini-contrib/sessionauth"
 	"github.com/martini-contrib/sessions"
-	"log"
 )
 
 var (
@@ -21,6 +23,8 @@ var (
 )
 
 func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	var dbError error
 	dbSession, dbError = rethink.Connect(rethink.ConnectOpts{
 		Address:  "localhost:28015",
